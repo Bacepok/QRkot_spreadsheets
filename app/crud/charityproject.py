@@ -20,7 +20,6 @@ class CRUDCharityProject(CRUDBase):
             )
         )
         return project.scalars().first()
-    
 
     async def get_projects_by_completion_rate(self, session: AsyncSession):
         """Возвращает список закрытых проектов отсортированных по скорости сбора средств."""
