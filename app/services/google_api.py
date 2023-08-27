@@ -1,33 +1,11 @@
 import datetime
+
+from app.services.constants import FORMAT, VERSION, RANGE, SPREADSHEET_URL, SPREADSHEET_BODY
 from datetime import datetime, timedelta
 
 from aiogoogle import Aiogoogle
 
 from app.core.config import settings
-
-FORMAT = "%Y/%m/%d %H:%M:%S"
-REPORT_ROW_COUNT = 100
-REPORT_COLUMN_COUNT = 10
-SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/%s"
-SPREADSHEET_BODY = {
-    "properties": {
-        "title": "QRKot. Отчет от %s",
-        "locale": "ru_RU",
-    },
-    "sheets": [
-        {
-            "properties": {
-                "sheetType": "GRID",
-                "sheetId": 0,
-                "title": "Лист1",
-                "gridProperties": {
-                    "rowCount": REPORT_ROW_COUNT,
-                    "columnCount": REPORT_COLUMN_COUNT,
-                },
-            }
-        }
-    ],
-}
 
 
 async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
@@ -38,7 +16,7 @@ async def spreadsheets_create(wrapper_services: Aiogoogle) -> str:
     now_date_time = datetime.now().strftime(FORMAT)
     spreadsheet_body = SPREADSHEET_BODY.copy()
     spreadsheet_body["properties"]["title"] %= now_date_time
-    service = await wrapper_services.discover("sheets", "v4")
+    service = await wrapper_services.discover(VERSION)
     response = await wrapper_services.as_service_account(
         service.spreadsheets.create(json=spreadsheet_body)
     )
@@ -91,7 +69,7 @@ async def spreadsheets_update_value(
     await wrapper_services.as_service_account(
         sheets_service.spreadsheets.values.update(
             spreadsheetId=spreadsheet_id,
-            range="A1:E30",
+            range=RANGE,
             valueInputOption="USER_ENTERED",
             json=update_body,
         )
